@@ -25,7 +25,7 @@ jobs:
           NEW_VERSION="$MAJOR.$MINOR.$PATCH"
           echo "New version: $NEW_VERSION"
 
-          sed -i "s/version=\"$CURRENT\"/version=\"$NEW_VERSION\"/" config.xml
+          perl -pi -e "s/version=\"$CURRENT\"/version=\"$NEW_VERSION\"/" config.xml
           echo "Updated config.xml to version $NEW_VERSION"
 
           git config user.name "github-actions[bot]"
