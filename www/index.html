@@ -343,6 +343,18 @@ function speak(text,lang,doneCb,tryCount){
   u.onerror=function(){if(doneCb)doneCb();};
   window.speechSynthesis.speak(u);
 }
+function speakHebrew(text){
+  if(!window.speechSynthesis)return;
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang='he-IL';
+  u.rate=0.82;
+  u.pitch=1.0;
+  u.volume=1;
+  var v=findVoice('he-IL');
+  if(v)u.voice=v;
+  window.speechSynthesis.speak(u);
+}
 function speakCurrent(){
   if(!currentItem)return;
   speakBtn.classList.add('speaking');
@@ -504,12 +516,12 @@ function handleAnswer(btn,chosen,correct){
     feedbackEl.classList.add('show','good');
     if(newlyMastered){
       feedbackEmoji.textContent='⭐';
-      feedbackText.textContent=(currentMode===1?correct.he+' = '+correct.display:currentMode===2?correct.display:correct.he+' = '+correct.num)+' — מסטר!';
-      playMastery();fireCute(40);
+      var masteredMsg=(currentMode===1?correct.he+' = '+correct.display:currentMode===2?correct.display:correct.he+' = '+correct.num)+' — מסטר!';feedbackText.textContent=masteredMsg;
+      playMastery();setTimeout(function(){speakHebrew(masteredMsg);},400);fireCute(40);
     }else{
       feedbackEmoji.textContent=streak>=5?'🔥':'💕';
-      feedbackText.textContent=PRAISE[Math.floor(Math.random()*PRAISE.length)];
-      playCorrect();
+      var praiseMsg=PRAISE[Math.floor(Math.random()*PRAISE.length)];feedbackText.textContent=praiseMsg;
+      playCorrect();setTimeout(function(){speakHebrew(praiseMsg);},400);
       if(!wrongThisRound)fireCute(18);
     }
     nextBtn.classList.add('show');
@@ -519,8 +531,8 @@ function handleAnswer(btn,chosen,correct){
     if(!wrongThisRound){wrongThisRound=true;streak=0;save();updateStats();}
     feedbackEl.classList.add('show','bad');
     feedbackEmoji.textContent='💪';
-    feedbackText.textContent=ENCOURAGE[Math.floor(Math.random()*ENCOURAGE.length)];
-    playWrong();
+    var encMsg=ENCOURAGE[Math.floor(Math.random()*ENCOURAGE.length)];feedbackText.textContent=encMsg;
+    playWrong();setTimeout(function(){speakHebrew(encMsg);},400);
   }
 }
 
