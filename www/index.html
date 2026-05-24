@@ -227,12 +227,12 @@ var HEBREW_NUMBERS=[
 ];
 
 var PRAISE=[
-  'וואו!',
-  'גאון!',
-  'יופי!',
-  'תמשיך ככה!',
-  'איזה חכם!',
-  'ציון 100!'
+  'וואו! 🤩',
+  'גאון! 🧠',
+  'יופי! 🌟',
+  'תמשיך ככה! 👍',
+  'איזה חכם! 💡',
+  'ציון 100! 💯'
 ];
 var ENCOURAGE=['נסה שוב!','כמעט!','בוא, תוכל!','כל כך!'];
 
@@ -325,14 +325,20 @@ function speak(text,lang,doneCb,tryCount){
 }
 function speakHebrew(text){
   if(!window.speechSynthesis)return;
-  window.speechSynthesis.cancel();
-  var u=new SpeechSynthesisUtterance(text);
+  var clean=text.replace(/[^א-תװ-״יִ-פֿ\s!-~]/g,'').trim();
+  if(!clean)return;
+  var u=new SpeechSynthesisUtterance(clean);
   u.lang='he-IL';
-  u.rate=0.82;
-  u.pitch=1.0;
+  u.rate=0.75;
+  u.pitch=1.1;
   u.volume=1;
-  var v=findVoice('he-IL');
-  if(v)u.voice=v;
+  var voices=window.speechSynthesis.getVoices();
+  var best=null;
+  for(var i=0;i<voices.length;i++){
+    var vl=(voices[i].lang||'').toLowerCase();
+    if(vl==='he-il'||vl==='he_il'||vl.indexOf('he')===0){best=voices[i];break;}
+  }
+  if(best)u.voice=best;
   window.speechSynthesis.speak(u);
 }
 function speakCurrent(){
@@ -497,11 +503,11 @@ function handleAnswer(btn,chosen,correct){
     if(newlyMastered){
       feedbackEmoji.textContent='⭐';
       var masteredMsg=(currentMode===1?correct.he+' = '+correct.display:currentMode===2?correct.display:correct.he+' = '+correct.num)+' — מסטר!';feedbackText.textContent=masteredMsg;
-      playMastery();setTimeout(function(){speakHebrew(masteredMsg);},400);fireCute(40);
+      playMastery();setTimeout(function(){speakHebrew(masteredMsg);},1200);fireCute(40);
     }else{
       feedbackEmoji.textContent=streak>=5?'🔥':'💕';
       var praiseMsg=PRAISE[Math.floor(Math.random()*PRAISE.length)];feedbackText.textContent=praiseMsg;
-      playCorrect();setTimeout(function(){speakHebrew(praiseMsg);},400);
+      playCorrect();setTimeout(function(){speakHebrew(praiseMsg);},1200);
       if(!wrongThisRound)fireCute(18);
     }
     nextBtn.classList.add('show');
@@ -512,7 +518,7 @@ function handleAnswer(btn,chosen,correct){
     feedbackEl.classList.add('show','bad');
     feedbackEmoji.textContent='💪';
     var encMsg=ENCOURAGE[Math.floor(Math.random()*ENCOURAGE.length)];feedbackText.textContent=encMsg;
-    playWrong();setTimeout(function(){speakHebrew(encMsg);},400);
+    playWrong();setTimeout(function(){speakHebrew(encMsg);},1000);
   }
 }
 
