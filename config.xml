@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <widget id="com.timurpiker.learnlatters" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>&#1500;&#1493;&#1502;&#1491;&#1497;&#1501; &#1488;&#1493;&#1514;&#1497;&#1493;&#1514;</name>
+    <name>LearnLatters</name>
     <description>Learn Hebrew letters, English letters and numbers 1-20 with sound! A fun interactive quiz app for kids and learners.</description>
     <author email="timurpiker@gmail.com" href="https://github.com/timurpik1985">Timur Piker</author>
 
