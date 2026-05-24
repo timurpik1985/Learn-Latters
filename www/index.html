@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>Sound Quest</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a1a2e">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+:root { --bg:#0f0f23; --card:#1a1a3e; --ink:#ffffff; --sub:#a0aec0; --m1:#f6c90e; --m2:#ff6b9d; --m3:#00d4aa; --border:rgba(255,255,255,0.12); --opt:#1e2a4a; --red:#ef4444; }
+html,body { height:100%; overflow:hidden; position:fixed; width:100%; }
+body { font-family:'Nunito',sans-serif; background:var(--bg); color:var(--ink); height:100vh; height:calc(var(--vh,1vh)*100); display:flex; flex-direction:column; padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom)) 10px; }
+body::before { content:''; position:fixed; inset:0; z-index:0; pointer-events:none; background-image: radial-gradient(1px 1px at 10% 20%,rgba(255,255,255,0.6) 0%,transparent 100%), radial-gradient(1px 1px at 70% 40%,rgba(255,255,255,0.3) 0%,transparent 100%), radial-gradient(2px 2px at 60% 55%,rgba(246,201,14,0.4) 0%,transparent 100%), radial-gradient(2px 2px at 25% 35%,rgba(0,212,170,0.3) 0%,transparent 100%); }
+.app { width:100%; max-width:520px; margin:0 auto; flex:1; display:flex; flex-direction:column; position:relative; z-index:1; min-height:0; gap:8px; }
+.header { display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+.logo { font-family:'Rubik',sans-serif; font-weight:900; font-size:18px; letter-spacing:-0.5px; }
+.logo span { color:var(--m1); }
+.stats { display:flex; gap:5px; }
+.stat { background:rgba(255,255,255,0.08); border:1px solid var(--border); border-radius:8px; padding:4px 8px; font-size:12px; font-weight:800; display:flex; align-items:center; gap:3px; }
+.stat.s-score { color:var(--m1); } .stat.s-streak { color:var(--m2); }
+.reset-btn { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.08); border:1px solid var(--border); color:var(--sub); font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+.mode-bar { display:flex; gap:5px; background:rgba(255,255,255,0.05); border:1px solid var(--border); border-radius:14px; padding:4px; flex-shrink:0; }
+.mode-btn { flex:1; padding:8px 4px; border:none; border-radius:11px; font-family:'Nunito',sans-serif; font-weight:800; font-size:11px; cursor:pointer; color:var(--sub); background:transparent; transition:all 0.2s; line-height:1.2; text-align:center; }
+.mode-btn.active { color:#000; }
+.mode-btn[data-mode="1"].active { background:var(--m1); }
+.mode-btn[data-mode="2"].active { background:var(--m2); }
+.mode-btn[data-mode="3"].active { background:var(--m3); }
+.mode-btn .m-num { font-size:16px; display:block; margin-bottom:2px; }
+.card { background:var(--card); border:1px solid var(--border); border-radius:20px; padding:14px; flex:1; display:flex; flex-direction:column; min-height:0; gap:10px; box-shadow:0 8px 40px rgba(0,0,0,0.5); }
+.progress-wrap { height:8px; background:rgba(255,255,255,0.08); border-radius:999px; overflow:hidden; flex-shrink:0; }
+.progress-bar { height:100%; border-radius:999px; transition:width 0.5s cubic-bezier(.34,1.56,.64,1); width:0%; }
+.mode-1 .progress-bar { background:linear-gradient(90deg,var(--m1),#ffe566); }
+.mode-2 .progress-bar { background:linear-gradient(90deg,var(--m2),#ff9ec6); }
+.mode-3 .progress-bar { background:linear-gradient(90deg,var(--m3),#5fffda); }
+.question-zone { border-radius:14px; padding:16px 12px 14px; text-align:center; flex-shrink:0; }
+.mode-1 .question-zone { background:linear-gradient(135deg,rgba(246,201,14,0.15),rgba(246,201,14,0.05)); border:1px solid rgba(246,201,14,0.3); }
+.mode-2 .question-zone { background:linear-gradient(135deg,rgba(255,107,157,0.15),rgba(255,107,157,0.05)); border:1px solid rgba(255,107,157,0.3); }
+.mode-3 .question-zone { background:linear-gradient(135deg,rgba(0,212,170,0.15),rgba(0,212,170,0.05)); border:1px solid rgba(0,212,170,0.3); }
+.q-label { font-size:10px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:10px; opacity:0.6; }
+.mode-1 .q-label { color:var(--m1); } .mode-2 .q-label { color:var(--m2); } .mode-3 .q-label { color:var(--m3); }
+.q-display { font-family:'Rubik',sans-serif; font-weight:900; font-size:clamp(32px,9vw,50px); line-height:1; margin-bottom:12px; direction:rtl; }
+.mode-2 .q-display { direction:ltr; color:var(--m2); }
+.mode-1 .q-display { color:var(--m1); }
+.mode-3 .q-display { color:var(--m3); font-size:clamp(26px,7vw,40px); }
+.speak-btn { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; border-radius:999px; border:none; font-family:'Nunito',sans-serif; font-weight:800; font-size:13px; cursor:pointer; transition:transform 0.15s; box-shadow:0 4px 15px rgba(0,0,0,0.3); }
+.mode-1 .speak-btn { background:var(--m1); color:#000; }
+.mode-2 .speak-btn { background:var(--m2); color:#fff; }
+.mode-3 .speak-btn { background:var(--m3); color:#000; }
+.speak-btn:active { transform:scale(0.95); }
+.speak-btn.speaking { animation:pulsebtn 0.7s ease-in-out infinite; }
+@keyframes pulsebtn { 0%,100%{transform:scale(1);}50%{transform:scale(1.06);} }
+.speak-btn svg { width:16px; height:16px; }
+.options { display:grid; gap:7px; flex:1; min-height:0; grid-template-columns:1fr 1fr; grid-template-rows:repeat(3,1fr); }
+.option { background:var(--opt); border:1.5px solid var(--border); border-radius:12px; padding:6px 10px; font-family:'Rubik',sans-serif; font-weight:700; font-size:clamp(15px,4.5vw,22px); color:var(--ink); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background 0.12s,transform 0.1s; min-height:0; }
+.option:active:not(:disabled) { transform:scale(0.97); }
+.option:disabled { cursor:not-allowed; }
+.option.opt-5 { grid-column:1/3; }
+.opt-char { font-size:clamp(18px,5.5vw,28px); font-weight:900; }
+.mode-1 .option { direction:rtl; font-size:clamp(18px,6vw,28px); }
+.option.correct { background:#16533a; border-color:var(--m3); animation:popIn 0.4s ease-out; }
+.option.wrong { background:#5a1a1a; border-color:var(--red); animation:shake 0.4s ease-out; }
+@keyframes popIn { 0%{transform:scale(1);}40%{transform:scale(1.05);}100%{transform:scale(1);} }
+@keyframes shake { 0%,100%{transform:translateX(0);}20%{transform:translateX(-5px);}40%{transform:translateX(5px);}60%{transform:translateX(-3px);}80%{transform:translateX(3px);} }
+.bottom-bar { flex-shrink:0; display:flex; flex-direction:column; gap:6px; }
+.feedback { padding:8px 12px; border-radius:10px; text-align:center; font-weight:700; font-size:14px; display:none; border:1px solid var(--border); direction:rtl; line-height:1.4; }
+.feedback.show { display:block; animation:slideUp 0.3s ease-out; }
+.feedback.good { background:rgba(0,212,170,0.15); border-color:var(--m3); color:#5fffda; }
+.feedback.bad { background:rgba(255,107,157,0.15); border-color:var(--m2); color:#ffb3ce; }
+@keyframes slideUp { from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);} }
+.next-btn { padding:13px; border-radius:12px; border:none; font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; cursor:pointer; display:none; transition:transform 0.1s; color:#000; }
+.next-btn.show { display:block; animation:slideUp 0.3s ease-out; }
+.next-btn:active { transform:scale(0.98); }
+.mode-1 .next-btn { background:var(--m1); }
+.mode-2 .next-btn { background:var(--m2); color:#fff; }
+.mode-3 .next-btn { background:var(--m3); }
+.all-done { text-align:center; flex:1; display:none; flex-direction:column; justify-content:center; align-items:center; gap:10px; }
+.all-done.show { display:flex; }
+.all-done .big { font-size:56px; line-height:1; }
+.all-done .title { font-family:'Rubik',sans-serif; font-weight:900; font-size:26px; }
+.all-done .sub { color:var(--sub); font-size:14px; direction:rtl; }
+.all-done .play-again { padding:13px 30px; border-radius:12px; border:none; font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; cursor:pointer; margin-top:6px; color:#000; }
+.mode-1 .all-done .play-again { background:var(--m1); }
+.mode-2 .all-done .play-again { background:var(--m2); color:#fff; }
+.mode-3 .all-done .play-again { background:var(--m3); }
+.game-area { display:flex; flex-direction:column; flex:1; min-height:0; gap:8px; }
+.game-area.hide { display:none; }
+.cute-pop { position:fixed; pointer-events:none; z-index:999; top:0; user-select:none; overflow:visible; }
+.cute-pop svg { width:100%; height:100%; display:block; }
+@media (max-height:680px) { .q-display{font-size:28px;} .speak-btn{padding:8px 16px;font-size:12px;} .option{font-size:15px;} .mode-1 .option{font-size:18px;} }
+</style>
+</head>
+<body>
+<div class="app mode-1">
+  <div class="header">
+    <div class="logo"><span>Sound</span> Quest</div>
+    <div class="stats">
+      <div class="stat s-score">⭐ <span id="scoreEl">0</span></div>
+      <div class="stat s-streak">🔥 <span id="streakEl">0</span></div>
+    </div>
+    <button class="reset-btn" id="resetBtn">↻</button>
+  </div>
+  <div class="mode-bar">
+    <button class="mode-btn active" data-mode="1"><span class="m-num">א</span>Hebrew Letters</button>
+    <button class="mode-btn" data-mode="2"><span class="m-num">A</span>English Letters</button>
+    <button class="mode-btn" data-mode="3"><span class="m-num">123</span>Hebrew Numbers</button>
+  </div>
+  <div class="card">
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="game-area" id="gameArea">
+      <div class="question-zone">
+        <div class="q-label" id="qLabel">Hear the letter — pick the Hebrew</div>
+        <div class="q-display" id="qDisplay">?</div>
+        <button class="speak-btn" id="speakBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+          </svg>
+          Hear it again
+        </button>
+      </div>
+      <div class="options" id="optionsEl"></div>
+      <div class="bottom-bar">
+        <div class="feedback" id="feedbackEl"><span id="feedbackEmoji"></span> <span id="feedbackText"></span></div>
+        <button class="next-btn" id="nextBtn">next →</button>
+      </div>
+    </div>
+    <div class="all-done" id="allDone">
+      <div class="big">🏆</div>
+      <div class="title">All Mastered!</div>
+      <div class="sub" id="allDoneSub"></div>
+      <button class="play-again" id="playAgainBtn">play again 🚀</button>
+    </div>
+  </div>
+</div>
+<script>
+var vh=function(){document.documentElement.style.setProperty('--vh',(window.innerHeight*0.01)+'px');};
+vh();window.addEventListener('resize',vh);window.addEventListener('orientationchange',vh);
+
+var HEBREW_LETTERS=[
+  {display:'א', he:'אָלֶף',       speak:'הָאוֹת אָלֶף',           gt:'הָאוֹת אָלֶף',           lang:'he-IL'},
+  {display:'ב', he:'בֵּית',        speak:'הָאוֹת בֵּית',            gt:'הָאוֹת בֵּית',            lang:'he-IL'},
+  {display:'ג', he:'גִּימֶל',      speak:'הָאוֹת גִּימֶל',          gt:'הָאוֹת גִּימֶל',          lang:'he-IL'},
+  {display:'ד', he:'דָּלֶת',       speak:'הָאוֹת דָּלֶת',           gt:'הָאוֹת דָּלֶת',           lang:'he-IL'},
+  {display:'ה', he:'הֵא',          speak:'הָאוֹת הֵא',              gt:'הָאוֹת הֵא',              lang:'he-IL'},
+  {display:'ו', he:'וָו',          speak:'הָאוֹת וָו',              gt:'הָאוֹת וָו',              lang:'he-IL'},
+  {display:'ז', he:'זַיִן',        speak:'הָאוֹת זַיִן',            gt:'הָאוֹת זַיִן',            lang:'he-IL'},
+  {display:'ח', he:'חֵית',         speak:'הָאוֹת חֵית',             gt:'הָאוֹת חֵית',             lang:'he-IL'},
+  {display:'ט', he:'טֵית',         speak:'הָאוֹת טֵית',             gt:'הָאוֹת טֵית',             lang:'he-IL'},
+  {display:'י', he:'יוֹד',         speak:'הָאוֹת יוֹד',             gt:'הָאוֹת יוֹד',             lang:'he-IL'},
+  {display:'כ', he:'כַּף',         speak:'הָאוֹת כַּף',             gt:'הָאוֹת כַּף',             lang:'he-IL'},
+  {display:'ך', he:'כַּף סוֹפִית', speak:'הָאוֹת כַּף סוֹפִית',     gt:'הָאוֹת כַּף סוֹפִית',     lang:'he-IL'},
+  {display:'ל', he:'לָמֶד',        speak:'הָאוֹת לָמֶד',            gt:'הָאוֹת לָמֶד',            lang:'he-IL'},
+  {display:'מ', he:'מֵם',          speak:'הָאוֹת מֵם',              gt:'הָאוֹת מֵם',              lang:'he-IL'},
+  {display:'ם', he:'מֵם סוֹפִית',  speak:'הָאוֹת מֵם סוֹפִית',      gt:'הָאוֹת מֵם סוֹפִית',      lang:'he-IL'},
+  {display:'נ', he:'נוּן',         speak:'הָאוֹת נוּן',             gt:'הָאוֹת נוּן',             lang:'he-IL'},
+  {display:'ן', he:'נוּן סוֹפִית', speak:'הָאוֹת נוּן סוֹפִית',     gt:'הָאוֹת נוּן סוֹפִית',     lang:'he-IL'},
+  {display:'ס', he:'סָמֶךְ',       speak:'הָאוֹת סָמֶךְ',           gt:'הָאוֹת סָמֶךְ',           lang:'he-IL'},
+  {display:'ע', he:'עַיִן',        speak:'הָאוֹת עַיִן',            gt:'הָאוֹת עַיִן',            lang:'he-IL'},
+  {display:'פ', he:'פֵּא',         speak:'הָאוֹת פֵּא',             gt:'הָאוֹת פֵּא',             lang:'he-IL'},
+  {display:'ף', he:'פֵּא סוֹפִית', speak:'הָאוֹת פֵּא סוֹפִית',     gt:'הָאוֹת פֵּא סוֹפִית',     lang:'he-IL'},
+  {display:'צ', he:'צַדִּי',       speak:'הָאוֹת צַדִּי',           gt:'הָאוֹת צַדִּי',           lang:'he-IL'},
+  {display:'ץ', he:'צַדִּי סוֹפִית', speak:'הָאוֹת צַדִּי סוֹפִית', gt:'הָאוֹת צַדִּי סוֹפִית',   lang:'he-IL'},
+  {display:'ק', he:'קוֹף',         speak:'הָאוֹת קוֹף',             gt:'הָאוֹת קוֹף',             lang:'he-IL'},
+  {display:'ר', he:'רֵישׁ',        speak:'הָאוֹת רֵישׁ',            gt:'הָאוֹת רֵישׁ',            lang:'he-IL'},
+  {display:'ש', he:'שִׁין',        speak:'הָאוֹת שִׁין',            gt:'הָאוֹת שִׁין',            lang:'he-IL'},
+  {display:'ת', he:'תָּו',         speak:'הָאוֹת תָּו',             gt:'הָאוֹת תָּו',             lang:'he-IL'}
+];
+
+var ENGLISH_LETTERS=[
+  {display:'A', name:'A', speak:'ay',         gt:'ay',         lang:'en-US'},
+  {display:'B', name:'B', speak:'bee',        gt:'bee',        lang:'en-US'},
+  {display:'C', name:'C', speak:'see',        gt:'see',        lang:'en-US'},
+  {display:'D', name:'D', speak:'dee',        gt:'dee',        lang:'en-US'},
+  {display:'E', name:'E', speak:'ee',         gt:'ee',         lang:'en-US'},
+  {display:'F', name:'F', speak:'ef',         gt:'ef',         lang:'en-US'},
+  {display:'G', name:'G', speak:'jee',        gt:'jee',        lang:'en-US'},
+  {display:'H', name:'H', speak:'aitch',      gt:'aitch',      lang:'en-US'},
+  {display:'I', name:'I', speak:'eye',        gt:'eye',        lang:'en-US'},
+  {display:'J', name:'J', speak:'jay',        gt:'jay',        lang:'en-US'},
+  {display:'K', name:'K', speak:'kay',        gt:'kay',        lang:'en-US'},
+  {display:'L', name:'L', speak:'el',         gt:'el',         lang:'en-US'},
+  {display:'M', name:'M', speak:'em',         gt:'em',         lang:'en-US'},
+  {display:'N', name:'N', speak:'en',         gt:'en',         lang:'en-US'},
+  {display:'O', name:'O', speak:'oh',         gt:'oh',         lang:'en-US'},
+  {display:'P', name:'P', speak:'pee',        gt:'pee',        lang:'en-US'},
+  {display:'Q', name:'Q', speak:'cue',        gt:'cue',        lang:'en-US'},
+  {display:'R', name:'R', speak:'ar',         gt:'ar',         lang:'en-US'},
+  {display:'S', name:'S', speak:'ess',        gt:'ess',        lang:'en-US'},
+  {display:'T', name:'T', speak:'tee',        gt:'tee',        lang:'en-US'},
+  {display:'U', name:'U', speak:'you',        gt:'you',        lang:'en-US'},
+  {display:'V', name:'V', speak:'vee',        gt:'vee',        lang:'en-US'},
+  {display:'W', name:'W', speak:'double you', gt:'double you', lang:'en-US'},
+  {display:'X', name:'X', speak:'ex',         gt:'ex',         lang:'en-US'},
+  {display:'Y', name:'Y', speak:'why',        gt:'why',        lang:'en-US'},
+  {display:'Z', name:'Z', speak:'zed',        gt:'zed',        lang:'en-US'}
+];
+
+var HEBREW_NUMBERS=[
+  {num:1,  he:'אַחַת',                 speak:'הַמִּסְפָּר אַחַת',                 gt:'הַמִּסְפָּר אַחַת',                 display:'1',  lang:'he-IL'},
+  {num:2,  he:'שְׁתַּיִם',             speak:'הַמִּסְפָּר שְׁתַּיִם',             gt:'הַמִּסְפָּר שְׁתַּיִם',             display:'2',  lang:'he-IL'},
+  {num:3,  he:'שָׁלוֹשׁ',              speak:'הַמִּסְפָּר שָׁלוֹשׁ',              gt:'הַמִּסְפָּר שָׁלוֹשׁ',              display:'3',  lang:'he-IL'},
+  {num:4,  he:'אַרְבַּע',              speak:'הַמִּסְפָּר אַרְבַּע',              gt:'הַמִּסְפָּר אַרְבַּע',              display:'4',  lang:'he-IL'},
+  {num:5,  he:'חָמֵשׁ',                speak:'הַמִּסְפָּר חָמֵשׁ',                gt:'הַמִּסְפָּר חָמֵשׁ',                display:'5',  lang:'he-IL'},
+  {num:6,  he:'שֵׁשׁ',                 speak:'הַמִּסְפָּר שֵׁשׁ',                 gt:'הַמִּסְפָּר שֵׁשׁ',                 display:'6',  lang:'he-IL'},
+  {num:7,  he:'שֶׁבַע',                speak:'הַמִּסְפָּר שֶׁבַע',                gt:'הַמִּסְפָּר שֶׁבַע',                display:'7',  lang:'he-IL'},
+  {num:8,  he:'שְׁמוֹנֶה',             speak:'הַמִּסְפָּר שְׁמוֹנֶה',             gt:'הַמִּסְפָּר שְׁמוֹנֶה',             display:'8',  lang:'he-IL'},
+  {num:9,  he:'תֵּשַׁע',               speak:'הַמִּסְפָּר תֵּשַׁע',               gt:'הַמִּסְפָּר תֵּשַׁע',               display:'9',  lang:'he-IL'},
+  {num:10, he:'עֶשֶׂר',                speak:'הַמִּסְפָּר עֶשֶׂר',                gt:'הַמִּסְפָּר עֶשֶׂר',                display:'10', lang:'he-IL'},
+  {num:11, he:'אַחַת עֶשְׂרֵה',        speak:'הַמִּסְפָּר אַחַת עֶשְׂרֵה',        gt:'הַמִּסְפָּר אַחַת עֶשְׂרֵה',        display:'11', lang:'he-IL'},
+  {num:12, he:'שְׁתֵּים עֶשְׂרֵה',     speak:'הַמִּסְפָּר שְׁתֵּים עֶשְׂרֵה',     gt:'הַמִּסְפָּר שְׁתֵּים עֶשְׂרֵה',     display:'12', lang:'he-IL'},
+  {num:13, he:'שְׁלוֹשׁ עֶשְׂרֵה',     speak:'הַמִּסְפָּר שְׁלוֹשׁ עֶשְׂרֵה',     gt:'הַמִּסְפָּר שְׁלוֹשׁ עֶשְׂרֵה',     display:'13', lang:'he-IL'},
+  {num:14, he:'אַרְבַּע עֶשְׂרֵה',     speak:'הַמִּסְפָּר אַרְבַּע עֶשְׂרֵה',     gt:'הַמִּסְפָּר אַרְבַּע עֶשְׂרֵה',     display:'14', lang:'he-IL'},
+  {num:15, he:'חֲמֵשׁ עֶשְׂרֵה',       speak:'הַמִּסְפָּר חֲמֵשׁ עֶשְׂרֵה',       gt:'הַמִּסְפָּר חֲמֵשׁ עֶשְׂרֵה',       display:'15', lang:'he-IL'},
+  {num:16, he:'שֵׁשׁ עֶשְׂרֵה',        speak:'הַמִּסְפָּר שֵׁשׁ עֶשְׂרֵה',        gt:'הַמִּסְפָּר שֵׁשׁ עֶשְׂרֵה',        display:'16', lang:'he-IL'},
+  {num:17, he:'שְׁבַע עֶשְׂרֵה',       speak:'הַמִּסְפָּר שְׁבַע עֶשְׂרֵה',       gt:'הַמִּסְפָּר שְׁבַע עֶשְׂרֵה',       display:'17', lang:'he-IL'},
+  {num:18, he:'שְׁמוֹנֶה עֶשְׂרֵה',    speak:'הַמִּסְפָּר שְׁמוֹנֶה עֶשְׂרֵה',    gt:'הַמִּסְפָּר שְׁמוֹנֶה עֶשְׂרֵה',    display:'18', lang:'he-IL'},
+  {num:19, he:'תְּשַׁע עֶשְׂרֵה',      speak:'הַמִּסְפָּר תְּשַׁע עֶשְׂרֵה',      gt:'הַמִּסְפָּר תְּשַׁע עֶשְׂרֵה',      display:'19', lang:'he-IL'},
+  {num:20, he:'עֶשְׂרִים',             speak:'הַמִּסְפָּר עֶשְׂרִים',             gt:'הַמִּסְפָּר עֶשְׂרִים',             display:'20', lang:'he-IL'}
+];
+
+var PRAISE=[
+  'אתה נהדר! 🤩',
+  'אתה גדול! 🌟',
+  'אתה מדהים! 💎',
+  'אתה גאון אמיתי! 🧠',
+  'אתה סופרסטאר! 🦄',
+  'אתה הכי טוב! 👑',
+  'אתה מקצוען אמיתי! 🔥',
+  'עבודה יפה מאוד! 👏',
+  'כל הכבוד! 🏆',
+  'וואו, זה מדהים! 🥳',
+  'יופי שלך! 🌸',
+  'איזה כיף לשחק איתך! 🎈',
+  'אתה מציף אותי! 😍',
+  'מצוין ברצינות! 💪',
+  'ניצחת שוב! 🌟',
+  'אתה פשוט מדהים! 🚀',
+  'כוכב אמיתי! 💫',
+  'איזה חכמון קטן! 🧠',
+  'בראבו עליך! 🎉',
+  'אתה לומד כל כך מהר! 🐦',
+  'פנטסטי באמת! 🌈',
+  'איזה שיא שלך! 💃',
+  'אתה גאון אמיתי! ⭐',
+  'מושלם לגמרי! 🤩',
+  'איזה זיכרון שיש לך! 🧠',
+  'נייס, באמת נייס! 👌',
+  'אתה גורם לי גאווה! 🤗',
+  'קדימה! 🏅',
+  'אתה פשוט מצוין! 🍏',
+  'תמשיך כך! 👍'
+];
+var ENCOURAGE=['נסה שוב!','כמעט!','בוא, תוכל!','כל כך!'];
+
+var CUTE_LIST=[
+  '🐱','🐈','🐶','🦄','😸',
+  '🌸','🌹','🌺','🌷','🍀',
+  '👼','⭐','🌈','🌟','💫',
+  '💜','💙','💚','💛','🧸'
+];
+var POODLE='🐩';
+var BUNNY_SVG='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82"><ellipse cx="30" cy="64" rx="18" ry="15" fill="#111" stroke="white" stroke-width="2.5"/><ellipse cx="30" cy="40" rx="14" ry="13" fill="#111" stroke="white" stroke-width="2.5"/><ellipse cx="21" cy="13" rx="5" ry="14" fill="#111" stroke="white" stroke-width="2.5"/><ellipse cx="21" cy="13" rx="2.5" ry="10" fill="#ff9aa2"/><ellipse cx="39" cy="13" rx="5" ry="14" fill="#111" stroke="white" stroke-width="2.5"/><ellipse cx="39" cy="13" rx="2.5" ry="10" fill="#ff9aa2"/><circle cx="24" cy="37" r="3.5" fill="white"/><circle cx="24" cy="37" r="2" fill="#1a1a1a"/><circle cx="24.8" cy="36.2" r="0.8" fill="white"/><circle cx="36" cy="37" r="3.5" fill="white"/><circle cx="36" cy="37" r="2" fill="#1a1a1a"/><circle cx="36.8" cy="36.2" r="0.8" fill="white"/><ellipse cx="30" cy="43" rx="2.5" ry="1.8" fill="#ff9aa2"/><path d="M27.5 45 Q30 47.5 32.5 45" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/><circle cx="47" cy="65" r="6" fill="#2a2a2a" stroke="white" stroke-width="1.5"/></svg>';
+var cuteCounter=0;
+
+var currentMode=1,score=0,streak=0,queue=[],mastered={},answered=false,wrongThisRound=false,currentItem=null;
+try{var sv=localStorage.getItem('sqv2');if(sv){var p=JSON.parse(sv);score=p.score||0;mastered=p.mastered||{};streak=p.streak||0;}}catch(e){}
+function save(){try{localStorage.setItem('sqv2',JSON.stringify({score:score,mastered:mastered,streak:streak}));}catch(e){}}
+
+function shuffle(arr){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function getPool(){return currentMode===1?HEBREW_LETTERS:currentMode===2?ENGLISH_LETTERS:HEBREW_NUMBERS;}
+function getModeKey(item){return currentMode===1?'m1_'+item.display:currentMode===2?'m2_'+item.display:'m3_'+item.num;}
+function masteredCount(){var pool=getPool(),n=0;for(var i=0;i<pool.length;i++)if(mastered[getModeKey(pool[i])])n++;return n;}
+function buildQueue(){var pool=getPool(),un=[],ma=[];for(var i=0;i<pool.length;i++){if(mastered[getModeKey(pool[i])])ma.push(pool[i]);else un.push(pool[i]);}queue=shuffle(un).concat(shuffle(ma));}
+function getNext(){if(queue.length===0)buildQueue();return queue.shift()||null;}
+
+var audioCtx=null;
+function getACtx(){if(!audioCtx){try{audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){return null;}}if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx;}
+function playNote(freq,t,dur,type,gain){var ctx=getACtx();if(!ctx)return;var o=ctx.createOscillator(),g=ctx.createGain();o.type=type||'triangle';o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(gain||0.2,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g);g.connect(ctx.destination);o.start(t);o.stop(t+dur);}
+function playCorrect(){var ctx=getACtx();if(!ctx)return;var n=ctx.currentTime;playNote(523,n,0.12,'triangle',0.22);playNote(659,n+0.09,0.12,'triangle',0.22);playNote(784,n+0.18,0.12,'triangle',0.22);playNote(1046,n+0.27,0.28,'triangle',0.28);}
+function playWrong(){var ctx=getACtx();if(!ctx)return;var n=ctx.currentTime;playNote(330,n,0.15,'sine',0.2);playNote(294,n+0.15,0.15,'sine',0.2);playNote(262,n+0.30,0.25,'sine',0.2);}
+function playMastery(){var ctx=getACtx();if(!ctx)return;var n=ctx.currentTime;playNote(523,n,0.18,'triangle',0.28);playNote(659,n+0.13,0.18,'triangle',0.28);playNote(784,n+0.26,0.18,'triangle',0.28);playNote(1046,n+0.39,0.35,'triangle',0.32);playNote(1319,n+0.50,0.45,'triangle',0.28);}
+
+var voices=[];
+var voicesLoadedOnce=false;
+function loadVoices(){
+  voices=window.speechSynthesis?window.speechSynthesis.getVoices():[];
+  voicesLoadedOnce=voices.length>0;
+}
+if(window.speechSynthesis){loadVoices();window.speechSynthesis.onvoiceschanged=loadVoices;}
+
+function normalizeHebrewForValidation(s){
+  return String(s||'')
+    .replace(/[֑-ׇ]/g,'')
+    .replace(/[״"׳'`\s\-]/g,'')
+    .trim();
+}
+
+function findVoice(lang){
+  var wanted=(lang||'he-IL').toLowerCase();
+  var primary=wanted.split('-')[0];
+  var hebrewNameHints=['hebrew','עברית','carmit','avri','he-il','he_il'];
+  function scoreVoice(v){
+    var score=0;
+    var vLang=(v.lang||'').toLowerCase();
+    var vName=(v.name||'').toLowerCase();
+    if(vLang===wanted)score+=100;
+    else if(vLang.indexOf(primary)===0)score+=70;
+    if(v.localService)score+=10;
+    for(var i=0;i<hebrewNameHints.length;i++)if(vName.indexOf(hebrewNameHints[i])>=0)score+=20;
+    return score;
+  }
+  var best=null,bestScore=0;
+  for(var i=0;i<voices.length;i++){
+    var s=scoreVoice(voices[i]);
+    if(s>bestScore){best=voices[i];bestScore=s;}
+  }
+  return bestScore>=70?best:null;
+}
+
+function speak(text,lang,doneCb,tryCount){
+  if(!window.speechSynthesis){if(doneCb)doneCb();return;}
+  lang=lang||'he-IL';
+  if(!voicesLoadedOnce&&(!voices||voices.length===0)&&(tryCount||0)<10){
+    loadVoices();
+    setTimeout(function(){speak(text,lang,doneCb,(tryCount||0)+1);},120);
+    return;
+  }
+  window.speechSynthesis.cancel();
+  var u=new SpeechSynthesisUtterance(text);
+  u.lang=lang;
+  var isHebrew=(u.lang||'').toLowerCase().indexOf('he')===0;
+  u.rate=isHebrew?0.66:0.82;
+  u.pitch=isHebrew?0.96:1.05;
+  u.volume=1;
+  var v=findVoice(u.lang);
+  if(v)u.voice=v;
+  if(isHebrew&&!v)console.warn('No Hebrew he-IL voice found. Browser will use a fallback voice, so pronunciation may not be perfect.');
+  u.onend=function(){if(doneCb)doneCb();};
+  u.onerror=function(){if(doneCb)doneCb();};
+  window.speechSynthesis.speak(u);
+}
+function speakCurrent(){
+  if(!currentItem)return;
+  speakBtn.classList.add('speaking');
+  var done=function(){speakBtn.classList.remove('speaking');};
+  speak(currentItem.speak,currentItem.lang||'he-IL',done);
+}
+
+function validatePronunciationGroundTruth(){
+  var errors=[];
+  function validateList(list,type,keyField){
+    var seen={};
+    for(var i=0;i<list.length;i++){
+      var item=list[i];
+      var key=String(item[keyField]);
+      if(seen[key])errors.push(type+' duplicate key '+key);
+      seen[key]=true;
+      if(item.lang!=='he-IL')errors.push(type+' '+key+' is not he-IL');
+      if(!item.speak||!item.gt)errors.push(type+' '+key+' missing speak/gt');
+      if(normalizeHebrewForValidation(item.speak)!==normalizeHebrewForValidation(item.gt)){
+        errors.push(type+' '+key+' speak does not match ground truth: '+item.speak+' != '+item.gt);
+      }
+    }
+  }
+  validateList(HEBREW_LETTERS,'letter','display');
+  validateList(HEBREW_NUMBERS,'number','num');
+  for(var e=0;e<ENGLISH_LETTERS.length;e++){
+    var en=ENGLISH_LETTERS[e];
+    if(en.lang!=='en-US')errors.push('English letter '+en.display+' is not en-US');
+    if(!en.speak||!en.gt)errors.push('English letter '+en.display+' missing speak/gt');
+    if(en.speak!==en.gt)errors.push('English letter '+en.display+' speak does not match ground truth');
+    if(/[A-Z]/.test(en.speak)||/capital/i.test(en.speak))errors.push('English letter '+en.display+' may be spoken as capital: '+en.speak);
+  }
+  if(HEBREW_LETTERS.length!==27)errors.push('Expected 27 Hebrew letter entries, got '+HEBREW_LETTERS.length);
+  if(HEBREW_NUMBERS.length!==20)errors.push('Expected 20 Hebrew number entries, got '+HEBREW_NUMBERS.length);
+  if(ENGLISH_LETTERS.length!==26)errors.push('Expected 26 English letter entries, got '+ENGLISH_LETTERS.length);
+  return {passed:errors.length===0,total:HEBREW_LETTERS.length+HEBREW_NUMBERS.length+ENGLISH_LETTERS.length,errors:errors};
+}
+window.validatePronunciationGroundTruth=validatePronunciationGroundTruth;
+
+function dropOne(emoji,isSvg,colorFilter,big){
+  var p=document.createElement('div');
+  p.className='cute-pop';
+  var sz=big?(44+Math.random()*16):(24+Math.random()*12);
+  p.style.left=(Math.random()*86+2)+'vw';
+  p.style.top=(-sz*1.5)+'px';
+  if(isSvg){
+    p.style.width=sz+'px';
+    p.style.height=(sz*1.4)+'px';
+    p.innerHTML=BUNNY_SVG;
+  }else{
+    p.style.width=sz+'px';
+    p.style.height=sz+'px';
+    p.style.fontSize=sz+'px';
+    p.style.lineHeight='1';
+    if(colorFilter)p.style.filter=colorFilter;
+    p.textContent=emoji;
+  }
+  document.body.appendChild(p);
+  var dur=2100+Math.random()*1100;
+  var drift=(Math.random()-0.5)*120;
+  var rot=(Math.random()-0.5)*340;
+  p.animate([
+    {transform:'translateY(0) translateX(0) rotate(0deg) scale('+(big?1.25:1)+')',opacity:1},
+    {transform:'translateY('+(window.innerHeight+sz+50)+'px) translateX('+drift+'px) rotate('+rot+'deg) scale(0.2)',opacity:0}
+  ],{duration:dur,easing:'ease-in',fill:'forwards'});
+  setTimeout(function(){if(p.parentNode)p.parentNode.removeChild(p);},dur+100);
+}
+
+function fireCute(n){
+  cuteCounter++;
+  var count=n||18;
+  var isSvg=false,emoji=null,filter=null,big=false;
+  if(cuteCounter%5===0){
+    isSvg=true; big=true;
+  }else if(cuteCounter%3===0){
+    emoji=POODLE;
+    filter='sepia(1) saturate(3) hue-rotate(340deg) brightness(0.7)';
+    big=true;
+  }else{
+    emoji=CUTE_LIST[Math.floor(Math.random()*CUTE_LIST.length)];
+  }
+  for(var i=0;i<count;i++){
+    (function(idx){
+      setTimeout(function(){dropOne(emoji,isSvg,filter,big);},idx*72);
+    })(i);
+  }
+}
+
+var appEl=document.querySelector('.app');
+var qDisplayEl=document.getElementById('qDisplay');
+var qLabelEl=document.getElementById('qLabel');
+var speakBtn=document.getElementById('speakBtn');
+var optionsEl=document.getElementById('optionsEl');
+var feedbackEl=document.getElementById('feedbackEl');
+var feedbackEmoji=document.getElementById('feedbackEmoji');
+var feedbackText=document.getElementById('feedbackText');
+var nextBtn=document.getElementById('nextBtn');
+var scoreEl=document.getElementById('scoreEl');
+var streakEl=document.getElementById('streakEl');
+var progressBar=document.getElementById('progressBar');
+var gameArea=document.getElementById('gameArea');
+var allDone=document.getElementById('allDone');
+var allDoneSub=document.getElementById('allDoneSub');
+var playAgainBtn=document.getElementById('playAgainBtn');
+var resetBtn=document.getElementById('resetBtn');
+var modeBtns=document.querySelectorAll('.mode-btn');
+
+function updateStats(){scoreEl.textContent=score;streakEl.textContent=streak;}
+function updateProgress(){var pool=getPool(),m=masteredCount();progressBar.style.width=(pool.length>0?(m/pool.length*100):0)+'%';}
+function setMode(m){
+  currentMode=m;appEl.className='app mode-'+m;
+  for(var i=0;i<modeBtns.length;i++)modeBtns[i].classList.toggle('active',parseInt(modeBtns[i].dataset.mode)===m);
+  if(m===1)qLabelEl.textContent='Hear the letter — pick the Hebrew';
+  else if(m===2)qLabelEl.textContent='Hear the letter — pick the English';
+  else qLabelEl.textContent='Hear the number — pick the digit';
+}
+
+function newQuestion(){
+  answered=false;wrongThisRound=false;
+  feedbackEl.classList.remove('show','good','bad');
+  nextBtn.classList.remove('show');
+  var pool=getPool();
+  if(masteredCount()===pool.length){showAllDone();return;}
+  var item=getNext();if(!item){showAllDone();return;}
+  currentItem=item;
+  if(currentMode===1){qDisplayEl.textContent=item.he;qDisplayEl.style.direction='rtl';}
+  else if(currentMode===2){qDisplayEl.textContent=item.display;qDisplayEl.style.direction='ltr';}
+  else{qDisplayEl.textContent=item.he;qDisplayEl.style.direction='rtl';}
+  updateProgress();
+  var distPool=pool.slice();
+  for(var i=0;i<distPool.length;i++)if(distPool[i]===item){distPool.splice(i,1);break;}
+  var distractors=shuffle(distPool).slice(0,4);
+  var allOpts=shuffle([item].concat(distractors));
+  optionsEl.innerHTML='';
+  for(var i=0;i<allOpts.length;i++){
+    (function(opt,idx){
+      var btn=document.createElement('button');
+      btn.className='option'+(idx===4?' opt-5':'');
+      btn.innerHTML='<span class="opt-char">'+opt.display+'</span>';
+      btn.addEventListener('click',function(){handleAnswer(btn,opt,item);});
+      optionsEl.appendChild(btn);
+    })(allOpts[i],i);
+  }
+  setTimeout(function(){speakCurrent();},300);
+}
+
+function handleAnswer(btn,chosen,correct){
+  if(answered)return;
+  var allBtns=optionsEl.querySelectorAll('.option');
+  var isCorrect=currentMode===3?(chosen.num===correct.num):(chosen.display===correct.display);
+  if(isCorrect){
+    answered=true;
+    for(var i=0;i<allBtns.length;i++)allBtns[i].disabled=true;
+    btn.classList.add('correct');
+    var k=getModeKey(correct),newlyMastered=false;
+    if(!wrongThisRound&&!mastered[k]){mastered[k]=true;newlyMastered=true;}
+    if(!wrongThisRound){streak++;score++;}
+    save();updateStats();updateProgress();
+    feedbackEl.classList.add('show','good');
+    if(newlyMastered){
+      feedbackEmoji.textContent='⭐';
+      feedbackText.textContent=(currentMode===1?correct.he+' = '+correct.display:currentMode===2?correct.display:correct.he+' = '+correct.num)+' — מסטר!';
+      playMastery();fireCute(40);
+    }else{
+      feedbackEmoji.textContent=streak>=5?'🔥':'💕';
+      feedbackText.textContent=PRAISE[Math.floor(Math.random()*PRAISE.length)];
+      playCorrect();
+      if(!wrongThisRound)fireCute(18);
+    }
+    nextBtn.classList.add('show');
+    if(masteredCount()===getPool().length)setTimeout(showAllDone,1600);
+  }else{
+    btn.classList.add('wrong');btn.disabled=true;
+    if(!wrongThisRound){wrongThisRound=true;streak=0;save();updateStats();}
+    feedbackEl.classList.add('show','bad');
+    feedbackEmoji.textContent='💪';
+    feedbackText.textContent=ENCOURAGE[Math.floor(Math.random()*ENCOURAGE.length)];
+    playWrong();
+  }
+}
+
+function showAllDone(){
+  gameArea.classList.add('hide');allDone.classList.add('show');
+  allDoneSub.textContent=currentMode===1?'ידעת את כל האותיות!':currentMode===2?'You know all the letters!':'ידעת את המספרים 1-20!';
+  fireCute(60);setTimeout(function(){fireCute(60);},500);
+  playMastery();
+}
+
+speakBtn.addEventListener('click',function(){getACtx();speakCurrent();});
+nextBtn.addEventListener('click',newQuestion);
+playAgainBtn.addEventListener('click',function(){
+  mastered={};score=0;streak=0;save();
+  allDone.classList.remove('show');gameArea.classList.remove('hide');
+  buildQueue();updateStats();updateProgress();newQuestion();
+});
+resetBtn.addEventListener('click',function(){
+  if(confirm('Reset all progress?')){
+    mastered={};score=0;streak=0;save();
+    allDone.classList.remove('show');gameArea.classList.remove('hide');
+    buildQueue();updateStats();updateProgress();newQuestion();
+  }
+});
+for(var mi=0;mi<modeBtns.length;mi++){
+  (function(btn){
+    btn.addEventListener('click',function(){
+      var m=parseInt(btn.dataset.mode);
+      setMode(m);allDone.classList.remove('show');gameArea.classList.remove('hide');
+      buildQueue();updateStats();updateProgress();newQuestion();
+    });
+  })(modeBtns[mi]);
+}
+
+function boot(){var v=validatePronunciationGroundTruth();if(v.passed){console.log('Pronunciation E2E validation passed:',v.total,'items including no-capital English letter speech');}else{console.error('Pronunciation E2E validation failed:',v.errors);}setMode(1);buildQueue();updateStats();updateProgress();newQuestion();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+</script>
+</body>
+</html>

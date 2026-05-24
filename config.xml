@@ -1,0 +1,123 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.timurpiker.learnlatters" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>&#1500;&#1493;&#1502;&#1491;&#1497;&#1501; &#1488;&#1493;&#1514;&#1497;&#1493;&#1514;</name>
+    <description>Learn Hebrew letters, English letters and numbers 1-20 with sound! A fun interactive quiz app for kids and learners.</description>
+    <author email="timurpiker@gmail.com" href="https://github.com/timurpik1985">Timur Piker</author>
+
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+    <allow-intent href="tel:*" />
+    <allow-intent href="sms:*" />
+    <allow-intent href="mailto:*" />
+    <allow-intent href="geo:*" />
+
+    <preference name="orientation" value="portrait" />
+    <preference name="Fullscreen" value="true" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="BackupWebStorage" value="none" />
+
+    <!-- Hook to add ATT plugin -->
+    <hook type="after_prepare" src="hooks/add_att_plugin.js" />
+
+    <platform name="ios">
+        <preference name="deployment-target" value="14.5" />
+        <preference name="SwiftVersion" value="5.3" />
+        <preference name="WKWebViewOnly" value="true" />
+        <preference name="CordovaWebViewEngine" value="CDVWKWebView" />
+
+        <preference name="StatusBarOverlaysWebView" value="false" />
+        <preference name="StatusBarBackgroundColor" value="#0f0f23" />
+        <preference name="StatusBarStyle" value="lightcontent" />
+
+        <icon src="res/ios/icon.png" width="1024" height="1024" />
+        <icon src="res/ios/icon-20.png" width="20" height="20" />
+        <icon src="res/ios/icon-29.png" width="29" height="29" />
+        <icon src="res/ios/icon-40.png" width="40" height="40" />
+        <icon src="res/ios/icon-50.png" width="50" height="50" />
+        <icon src="res/ios/icon-57.png" width="57" height="57" />
+        <icon src="res/ios/icon-58.png" width="58" height="58" />
+        <icon src="res/ios/icon-60.png" width="60" height="60" />
+        <icon src="res/ios/icon-72.png" width="72" height="72" />
+        <icon src="res/ios/icon-76.png" width="76" height="76" />
+        <icon src="res/ios/icon-80.png" width="80" height="80" />
+        <icon src="res/ios/icon-87.png" width="87" height="87" />
+        <icon src="res/ios/icon-100.png" width="100" height="100" />
+        <icon src="res/ios/icon-114.png" width="114" height="114" />
+        <icon src="res/ios/icon-120.png" width="120" height="120" />
+        <icon src="res/ios/icon-144.png" width="144" height="144" />
+        <icon src="res/ios/icon-152.png" width="152" height="152" />
+        <icon src="res/ios/icon-167.png" width="167" height="167" />
+        <icon src="res/ios/icon-180.png" width="180" height="180" />
+
+        <edit-config file="*-Info.plist" mode="merge" target="NSAppTransportSecurity">
+            <dict>
+                <key>NSAllowsArbitraryLoads</key>
+                <true/>
+            </dict>
+        </edit-config>
+
+        <edit-config file="*-Info.plist" mode="merge" target="UIRequiresFullScreen">
+            <true/>
+        </edit-config>
+
+        <edit-config file="*-Info.plist" mode="merge" target="UISupportedInterfaceOrientations">
+            <array>
+                <string>UIInterfaceOrientationPortrait</string>
+            </array>
+        </edit-config>
+
+        <edit-config file="*-Info.plist" mode="merge" target="UISupportedInterfaceOrientations~ipad">
+            <array>
+                <string>UIInterfaceOrientationPortrait</string>
+                <string>UIInterfaceOrientationPortraitUpsideDown</string>
+            </array>
+        </edit-config>
+
+        <!-- App Tracking Transparency Permission -->
+        <edit-config file="*-Info.plist" mode="merge" target="NSUserTrackingUsageDescription">
+            <string>This identifier will be used to deliver personalized ads to you.</string>
+        </edit-config>
+
+        <!-- AdMob App ID - UPDATE THIS WITH YOUR NEW APP'S ADMOB ID -->
+        <edit-config file="*-Info.plist" mode="merge" target="GADApplicationIdentifier">
+            <string>ca-app-pub-1629985022407089~9813154293</string>
+        </edit-config>
+
+        <!-- SKAdNetwork IDs -->
+        <edit-config file="*-Info.plist" mode="merge" target="SKAdNetworkItems">
+            <array>
+                <dict><key>SKAdNetworkIdentifier</key><string>cstr6suwn9.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>4fzdc2evr5.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>4pfyvq9l8r.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>2u9pt9hc89.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>uw77j35x4d.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>8s468mfl3y.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>av6w8kgt66.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>klf5c3l5u5.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>ppxm28t8ap.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>424m5254lk.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>v72qych5uu.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>ludvb6z3bs.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>c6k4g5qg8m.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>wg4vff78zm.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>v9wttpbfk9.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>n38lu8286q.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>24t9a8vw3c.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>252b5q8x7y.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>294l99pt4k.skadnetwork</string></dict>
+                <dict><key>SKAdNetworkIdentifier</key><string>32z4fx6l9h.skadnetwork</string></dict>
+            </array>
+        </edit-config>
+    </platform>
+
+    <!-- Core Plugins -->
+    <plugin name="cordova-plugin-whitelist" source="npm" />
+    <plugin name="cordova-plugin-statusbar" source="npm" />
+
+    <!-- AdMob Plugin -->
+    <plugin name="admob-plus-cordova" source="npm">
+        <variable name="APP_ID_IOS" value="ca-app-pub-1629985022407089~9813154293" />
+    </plugin>
+</widget>

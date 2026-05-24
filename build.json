@@ -1,0 +1,10 @@
+{
+    "ios": {
+        "release": {
+            "codeSignIdentity": "Apple Distribution",
+            "developmentTeam": "4MJJM2RJTP",
+            "packageType": "app-store",
+            "provisioningProfile": "YOUR_PROVISIONING_PROFILE_UUID"
+        }
+    }
+}
