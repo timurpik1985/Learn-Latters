@@ -10,6 +10,29 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto increment version in config.xml
+        run: |
+          CURRENT=$(grep -o 'version="[^"]*"' config.xml | head -1 | grep -o '[0-9.]*')
+          echo "Current version: $CURRENT"
+
+          MAJOR=$(echo $CURRENT | cut -d. -f1)
+          MINOR=$(echo $CURRENT | cut -d. -f2)
+          PATCH=$(echo $CURRENT | cut -d. -f3)
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+          echo "New version: $NEW_VERSION"
+
+          sed -i "s/version=\"$CURRENT\"/version=\"$NEW_VERSION\"/" config.xml
+          echo "Updated config.xml to version $NEW_VERSION"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add config.xml
+          git commit -m "Auto bump version to $NEW_VERSION [skip ci]"
+          git push
 
       - name: Select Xcode 26
         run: |
@@ -80,67 +103,30 @@ jobs:
 
       - name: Fix Pods framework reference for Hebrew app name
         run: |
-          echo "Fixing broken Pods______________ framework reference caused by Hebrew app name..."
           PBXPROJ=$(find platforms/ios -name "project.pbxproj" -not -path "*/Pods/*" | head -n 1)
-          echo "pbxproj: $PBXPROJ"
-
-          # Find the actual Pods framework name used in the Pods project
-          PODS_XCODEPROJ=$(find platforms/ios/Pods -name "*.xcodeproj" | head -n 1)
-          echo "Pods xcodeproj: $PODS_XCODEPROJ"
-
-          # Replace the broken Pods______________ with the correct Pods-<appname> reference
-          # The issue is Hebrew chars get mangled in the framework name
-          # Fix: replace any 'Pods__*' framework reference with correct name
-          PODS_FRAMEWORK=$(grep -o 'Pods-[^ "]*' "$PBXPROJ" | head -n 1 || true)
-          echo "Found Pods framework name: $PODS_FRAMEWORK"
-
-          if [ -z "$PODS_FRAMEWORK" ]; then
-            echo "Trying to find framework in Pods build settings..."
-            PODS_FRAMEWORK=$(find platforms/ios/Pods -name "*.framework" | grep -v ".dSYM" | head -n 1 | xargs basename | sed 's/.framework//' || true)
-          fi
-
-          # Direct fix: patch the OTHER_LDFLAGS to remove the broken Pods__ reference
           perl -0pi -e 's/-framework ["\x27]?Pods_{2,}["\x27]?//g' "$PBXPROJ"
-          echo "Removed broken Pods______________ framework reference"
-
-          # Also fix in Pods xcconfig files if present
           find platforms/ios -name "*.xcconfig" -not -path "*/DerivedData/*" | while read f; do
             perl -0pi -e 's/-framework ["\x27]?Pods_{2,}["\x27]?//g' "$f"
           done
-
           echo "Pods fix complete."
 
       - name: Patch AdMob Plus Swift Compatibility for Xcode 26
         run: |
-          echo "Patching admob-plus-cordova Swift files for Xcode 26 + cordova-ios 7.1.1..."
-
           ADMOB_DIR=$(find platforms/ios -path "*/Plugins/admob-plus-cordova" -type d | head -n 1)
-
           if [ -z "$ADMOB_DIR" ]; then
             echo "ERROR: admob-plus-cordova plugin directory not found."
-            find platforms/ios -path "*admob*" -type f || true
             exit 1
           fi
-
-          echo "AdMob plugin dir: $ADMOB_DIR"
-
           find "$ADMOB_DIR" -name "*.swift" -print0 | xargs -0 perl -0pi -e 's/callbackId: command\.callbackId\)/callbackId: command.callbackId!\)/g'
           find "$ADMOB_DIR" -name "*.swift" -print0 | xargs -0 perl -0pi -e 's/result\.setKeepCallbackAs\(true\)/result?.setKeepCallbackAs(true)/g'
           find "$ADMOB_DIR" -name "*.swift" -print0 | xargs -0 perl -0pi -e 's/result\?\.setKeepCallbackAs\(true\)/result?.setKeepCallbackAs(true)/g'
           find "$ADMOB_DIR" -name "*.swift" -print0 | xargs -0 perl -0pi -e 's/fromRootViewController: plugin\.viewController/fromRootViewController: plugin.viewController!/g'
           find "$ADMOB_DIR" -name "*.swift" -print0 | xargs -0 perl -0pi -e 's/rootViewController: plugin\.viewController/rootViewController: plugin.viewController!/g'
-
           echo "Patch complete."
 
       - name: Stabilize Swift Release Build
         run: |
           PBXPROJ=$(find platforms/ios -name "project.pbxproj" -not -path "*/Pods/*" | head -n 1)
-
-          if [ -z "$PBXPROJ" ]; then
-            echo "ERROR: project.pbxproj not found"
-            exit 1
-          fi
-
           perl -0pi -e 's/SWIFT_OPTIMIZATION_LEVEL = "-O";/SWIFT_OPTIMIZATION_LEVEL = "-Onone";/g' "$PBXPROJ"
           perl -0pi -e 's/SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";/SWIFT_OPTIMIZATION_LEVEL = "-Onone";/g' "$PBXPROJ"
           perl -0pi -e 's/SWIFT_COMPILATION_MODE = wholemodule;/SWIFT_COMPILATION_MODE = singlefile;/g' "$PBXPROJ"
@@ -152,9 +138,7 @@ jobs:
         run: |
           PLIST_PATH=$(find platforms/ios -name "*-Info.plist" -not -path "*/Pods/*" | head -n 1)
           echo "Checking plist: $PLIST_PATH"
-          echo "NSUserTrackingUsageDescription:"
           /usr/libexec/PlistBuddy -c "Print :NSUserTrackingUsageDescription" "$PLIST_PATH"
-          echo "GADApplicationIdentifier:"
           /usr/libexec/PlistBuddy -c "Print :GADApplicationIdentifier" "$PLIST_PATH"
 
       - name: Verify iOS icon resources
@@ -166,14 +150,12 @@ jobs:
           PLIST_PATH=$(find platforms/ios -name "*-Info.plist" -not -path "*/Pods/*" | head -n 1)
           if [ -f "$PLIST_PATH" ]; then
             /usr/libexec/PlistBuddy -c "Add :UIRequiresFullScreen bool true" "$PLIST_PATH" || /usr/libexec/PlistBuddy -c "Set :UIRequiresFullScreen true" "$PLIST_PATH"
-            echo "Patched $PLIST_PATH"
           fi
 
       - name: Build Signed App
         run: |
           set -o pipefail
           touch "$RUNNER_TEMP/cordova-build.log"
-
           cordova build ios --release --device --buildConfig=build.json --non-interactive \
             --buildFlag="SWIFT_OPTIMIZATION_LEVEL=-Onone" \
             --buildFlag="SWIFT_COMPILATION_MODE=singlefile" \
