@@ -141,33 +141,37 @@ var vh=function(){document.documentElement.style.setProperty('--vh',(window.inne
 vh();window.addEventListener('resize',vh);window.addEventListener('orientationchange',vh);
 
 var HEBREW_LETTERS=[
-  {display:'א', he:'אָלֶף',       speak:'הָאוֹת אָלֶף',           gt:'הָאוֹת אָלֶף',           lang:'he-IL'},
-  {display:'ב', he:'בֵּית',        speak:'הָאוֹת בֵּית',            gt:'הָאוֹת בֵּית',            lang:'he-IL'},
-  {display:'ג', he:'גִּימֶל',      speak:'הָאוֹת גִּימֶל',          gt:'הָאוֹת גִּימֶל',          lang:'he-IL'},
-  {display:'ד', he:'דָּלֶת',       speak:'הָאוֹת דָּלֶת',           gt:'הָאוֹת דָּלֶת',           lang:'he-IL'},
-  {display:'ה', he:'הֵא',          speak:'הָאוֹת הֵא',              gt:'הָאוֹת הֵא',              lang:'he-IL'},
-  {display:'ו', he:'וָו',          speak:'הָאוֹת וָו',              gt:'הָאוֹת וָו',              lang:'he-IL'},
-  {display:'ז', he:'זַיִן',        speak:'הָאוֹת זַיִן',            gt:'הָאוֹת זַיִן',            lang:'he-IL'},
-  {display:'ח', he:'חֵית',         speak:'הָאוֹת חֵית',             gt:'הָאוֹת חֵית',             lang:'he-IL'},
-  {display:'ט', he:'טֵית',         speak:'הָאוֹת טֵית',             gt:'הָאוֹת טֵית',             lang:'he-IL'},
-  {display:'י', he:'יוֹד',         speak:'הָאוֹת יוֹד',             gt:'הָאוֹת יוֹד',             lang:'he-IL'},
-  {display:'כ', he:'כַּף',         speak:'הָאוֹת כַּף',             gt:'הָאוֹת כַּף',             lang:'he-IL'},
-  {display:'ך', he:'כַּף סוֹפִית', speak:'הָאוֹת כַּף סוֹפִית',     gt:'הָאוֹת כַּף סוֹפִית',     lang:'he-IL'},
-  {display:'ל', he:'לָמֶד',        speak:'הָאוֹת לָמֶד',            gt:'הָאוֹת לָמֶד',            lang:'he-IL'},
-  {display:'מ', he:'מֵם',          speak:'הָאוֹת מֵם',              gt:'הָאוֹת מֵם',              lang:'he-IL'},
-  {display:'ם', he:'מֵם סוֹפִית',  speak:'הָאוֹת מֵם סוֹפִית',      gt:'הָאוֹת מֵם סוֹפִית',      lang:'he-IL'},
-  {display:'נ', he:'נוּן',         speak:'הָאוֹת נוּן',             gt:'הָאוֹת נוּן',             lang:'he-IL'},
-  {display:'ן', he:'נוּן סוֹפִית', speak:'הָאוֹת נוּן סוֹפִית',     gt:'הָאוֹת נוּן סוֹפִית',     lang:'he-IL'},
-  {display:'ס', he:'סָמֶךְ',       speak:'הָאוֹת סָמֶךְ',           gt:'הָאוֹת סָמֶךְ',           lang:'he-IL'},
-  {display:'ע', he:'עַיִן',        speak:'הָאוֹת עַיִן',            gt:'הָאוֹת עַיִן',            lang:'he-IL'},
-  {display:'פ', he:'פֵּא',         speak:'הָאוֹת פֵּא',             gt:'הָאוֹת פֵּא',             lang:'he-IL'},
-  {display:'ף', he:'פֵּא סוֹפִית', speak:'הָאוֹת פֵּא סוֹפִית',     gt:'הָאוֹת פֵּא סוֹפִית',     lang:'he-IL'},
-  {display:'צ', he:'צַדִּי',       speak:'הָאוֹת צַדִּי',           gt:'הָאוֹת צַדִּי',           lang:'he-IL'},
-  {display:'ץ', he:'צַדִּי סוֹפִית', speak:'הָאוֹת צַדִּי סוֹפִית', gt:'הָאוֹת צַדִּי סוֹפִית',   lang:'he-IL'},
-  {display:'ק', he:'קוֹף',         speak:'הָאוֹת קוֹף',             gt:'הָאוֹת קוֹף',             lang:'he-IL'},
-  {display:'ר', he:'רֵישׁ',        speak:'הָאוֹת רֵישׁ',            gt:'הָאוֹת רֵישׁ',            lang:'he-IL'},
-  {display:'ש', he:'שִׁין',        speak:'הָאוֹת שִׁין',            gt:'הָאוֹת שִׁין',            lang:'he-IL'},
-  {display:'ת', he:'תָּו',         speak:'הָאוֹת תָּו',             gt:'הָאוֹת תָּו',             lang:'he-IL'}
+  {display:'א', he:'אָלֶף',          speak:'הָאוֹת אָלֶף',            gt:'הָאוֹת אָלֶף',            sound:'silent',  lang:'he-IL'},
+  {display:'בּ', he:'בֵּית',          speak:'הָאוֹת בֵּית',             gt:'הָאוֹת בֵּית',             sound:'B',       lang:'he-IL'},
+  {display:'ב', he:'בֵית',            speak:'הָאוֹת וֵית',              gt:'הָאוֹת וֵית',              sound:'V',       lang:'he-IL'},
+  {display:'ג', he:'גִּימֶל',         speak:'הָאוֹת גִּימֶל',           gt:'הָאוֹת גִּימֶל',           sound:'G',       lang:'he-IL'},
+  {display:'ד', he:'דָּלֶת',          speak:'הָאוֹת דָּלֶת',            gt:'הָאוֹת דָּלֶת',            sound:'D',       lang:'he-IL'},
+  {display:'ה', he:'הֵא',             speak:'הָאוֹת הֵא',               gt:'הָאוֹת הֵא',               sound:'H',       lang:'he-IL'},
+  {display:'ו', he:'וָו',             speak:'הָאוֹת וָו',               gt:'הָאוֹת וָו',               sound:'V',       lang:'he-IL'},
+  {display:'ז', he:'זַיִן',           speak:'הָאוֹת זַיִן',             gt:'הָאוֹת זַיִן',             sound:'Z',       lang:'he-IL'},
+  {display:'ח', he:'חֵית',            speak:'הָאוֹת חֵית',              gt:'הָאוֹת חֵית',              sound:'CH',      lang:'he-IL'},
+  {display:'ט', he:'טֵית',            speak:'הָאוֹת טֵית',              gt:'הָאוֹת טֵית',              sound:'T',       lang:'he-IL'},
+  {display:'י', he:'יוֹד',            speak:'הָאוֹת יוֹד',              gt:'הָאוֹת יוֹד',              sound:'Y',       lang:'he-IL'},
+  {display:'כּ', he:'כַּף',           speak:'הָאוֹת כַּף',              gt:'הָאוֹת כַּף',              sound:'K',       lang:'he-IL'},
+  {display:'כ', he:'כַף',             speak:'הָאוֹת חַף',               gt:'הָאוֹת חַף',               sound:'CH',      lang:'he-IL'},
+  {display:'ך', he:'כַּף סוֹפִית',    speak:'הָאוֹת כַּף סוֹפִית',      gt:'הָאוֹת כַּף סוֹפִית',      sound:'CH',      lang:'he-IL'},
+  {display:'ל', he:'לָמֶד',           speak:'הָאוֹת לָמֶד',             gt:'הָאוֹת לָמֶד',             sound:'L',       lang:'he-IL'},
+  {display:'מ', he:'מֵם',             speak:'הָאוֹת מֵם',               gt:'הָאוֹת מֵם',               sound:'M',       lang:'he-IL'},
+  {display:'ם', he:'מֵם סוֹפִית',     speak:'הָאוֹת מֵם סוֹפִית',       gt:'הָאוֹת מֵם סוֹפִית',       sound:'M',       lang:'he-IL'},
+  {display:'נ', he:'נוּן',            speak:'הָאוֹת נוּן',              gt:'הָאוֹת נוּן',              sound:'N',       lang:'he-IL'},
+  {display:'ן', he:'נוּן סוֹפִית',    speak:'הָאוֹת נוּן סוֹפִית',      gt:'הָאוֹת נוּן סוֹפִית',      sound:'N',       lang:'he-IL'},
+  {display:'ס', he:'סָמֶךְ',          speak:'הָאוֹת סָמֶךְ',            gt:'הָאוֹת סָמֶךְ',            sound:'S',       lang:'he-IL'},
+  {display:'ע', he:'עַיִן',           speak:'הָאוֹת עַיִן',             gt:'הָאוֹת עַיִן',             sound:'silent',  lang:'he-IL'},
+  {display:'פּ', he:'פֵּא',           speak:'הָאוֹת פֵּא',              gt:'הָאוֹת פֵּא',              sound:'P',       lang:'he-IL'},
+  {display:'פ', he:'פֵא',             speak:'הָאוֹת פֵי',               gt:'הָאוֹת פֵי',               sound:'F',       lang:'he-IL'},
+  {display:'ף', he:'פֵּא סוֹפִית',    speak:'הָאוֹת פֵּא סוֹפִית',      gt:'הָאוֹת פֵּא סוֹפִית',      sound:'F',       lang:'he-IL'},
+  {display:'צ', he:'צַדִּי',          speak:'הָאוֹת צַדִּי',            gt:'הָאוֹת צַדִּי',            sound:'TS',      lang:'he-IL'},
+  {display:'ץ', he:'צַדִּי סוֹפִית',  speak:'הָאוֹת צַדִּי סוֹפִית',    gt:'הָאוֹת צַדִּי סוֹפִית',    sound:'TS',      lang:'he-IL'},
+  {display:'ק', he:'קוֹף',            speak:'הָאוֹת קוֹף',              gt:'הָאוֹת קוֹף',              sound:'K',       lang:'he-IL'},
+  {display:'ר', he:'רֵישׁ',           speak:'הָאוֹת רֵישׁ',             gt:'הָאוֹת רֵישׁ',             sound:'R',       lang:'he-IL'},
+  {display:'שׁ', he:'שִׁין',          speak:'הָאוֹת שִׁין',             gt:'הָאוֹת שִׁין',             sound:'SH',      lang:'he-IL'},
+  {display:'שׂ', he:'שִׂין',          speak:'הָאוֹת שִׂין',             gt:'הָאוֹת שִׂין',             sound:'S',       lang:'he-IL'},
+  {display:'ת', he:'תָּו',            speak:'הָאוֹת תָּו',              gt:'הָאוֹת תָּו',              sound:'T',       lang:'he-IL'}
 ];
 
 var ENGLISH_LETTERS=[
@@ -223,36 +227,12 @@ var HEBREW_NUMBERS=[
 ];
 
 var PRAISE=[
-  'אתה נהדר! 🤩',
-  'אתה גדול! 🌟',
-  'אתה מדהים! 💎',
-  'אתה גאון אמיתי! 🧠',
-  'אתה סופרסטאר! 🦄',
-  'אתה הכי טוב! 👑',
-  'אתה מקצוען אמיתי! 🔥',
-  'עבודה יפה מאוד! 👏',
-  'כל הכבוד! 🏆',
-  'וואו, זה מדהים! 🥳',
-  'יופי שלך! 🌸',
-  'איזה כיף לשחק איתך! 🎈',
-  'אתה מציף אותי! 😍',
-  'מצוין ברצינות! 💪',
-  'ניצחת שוב! 🌟',
-  'אתה פשוט מדהים! 🚀',
-  'כוכב אמיתי! 💫',
-  'איזה חכמון קטן! 🧠',
-  'בראבו עליך! 🎉',
-  'אתה לומד כל כך מהר! 🐦',
-  'פנטסטי באמת! 🌈',
-  'איזה שיא שלך! 💃',
-  'אתה גאון אמיתי! ⭐',
-  'מושלם לגמרי! 🤩',
-  'איזה זיכרון שיש לך! 🧠',
-  'נייס, באמת נייס! 👌',
-  'אתה גורם לי גאווה! 🤗',
-  'קדימה! 🏅',
-  'אתה פשוט מצוין! 🍏',
-  'תמשיך כך! 👍'
+  'וואו!',
+  'גאון!',
+  'יופי!',
+  'תמשיך ככה!',
+  'איזה חכם!',
+  'ציון 100!'
 ];
 var ENCOURAGE=['נסה שוב!','כמעט!','בוא, תוכל!','כל כך!'];
 
@@ -387,7 +367,7 @@ function validatePronunciationGroundTruth(){
     if(en.speak!==en.gt)errors.push('English letter '+en.display+' speak does not match ground truth');
     if(/[A-Z]/.test(en.speak)||/capital/i.test(en.speak))errors.push('English letter '+en.display+' may be spoken as capital: '+en.speak);
   }
-  if(HEBREW_LETTERS.length!==27)errors.push('Expected 27 Hebrew letter entries, got '+HEBREW_LETTERS.length);
+  if(HEBREW_LETTERS.length!==31)errors.push('Expected 31 Hebrew letter entries, got '+HEBREW_LETTERS.length);
   if(HEBREW_NUMBERS.length!==20)errors.push('Expected 20 Hebrew number entries, got '+HEBREW_NUMBERS.length);
   if(ENGLISH_LETTERS.length!==26)errors.push('Expected 26 English letter entries, got '+ENGLISH_LETTERS.length);
   return {passed:errors.length===0,total:HEBREW_LETTERS.length+HEBREW_NUMBERS.length+ENGLISH_LETTERS.length,errors:errors};
