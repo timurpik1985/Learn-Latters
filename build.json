@@ -4,7 +4,7 @@
             "codeSignIdentity": "Apple Distribution",
             "developmentTeam": "4MJJM2RJTP",
             "packageType": "app-store",
-            "provisioningProfile": "YOUR_PROVISIONING_PROFILE_UUID"
+            "provisioningProfile": "96ace776-4748-427a-8f6a-36e655833912"
         }
     }
 }
