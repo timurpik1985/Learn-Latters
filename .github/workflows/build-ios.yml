@@ -65,14 +65,6 @@ jobs:
           cp "$PP_PATH" ~/Library/MobileDevice/Provisioning\ Profiles/$UUID.mobileprovision
 
           echo "Installed provisioning profile UUID: $UUID"
-          echo "PROFILE_UUID=$UUID" >> $GITHUB_ENV
-
-      - name: Update build.json with real profile UUID
-        run: |
-          sed -i '' "s/YOUR_PROVISIONING_PROFILE_UUID/$PROFILE_UUID/" build.json || \
-          sed -i "s/YOUR_PROVISIONING_PROFILE_UUID/$PROFILE_UUID/" build.json
-          echo "build.json updated:"
-          cat build.json
 
       - name: System Environment Setup
         run: |
@@ -85,6 +77,38 @@ jobs:
         run: |
           rm -rf platforms plugins
           cordova platform add ios@7.1.1 --non-interactive
+
+      - name: Fix Pods framework reference for Hebrew app name
+        run: |
+          echo "Fixing broken Pods______________ framework reference caused by Hebrew app name..."
+          PBXPROJ=$(find platforms/ios -name "project.pbxproj" -not -path "*/Pods/*" | head -n 1)
+          echo "pbxproj: $PBXPROJ"
+
+          # Find the actual Pods framework name used in the Pods project
+          PODS_XCODEPROJ=$(find platforms/ios/Pods -name "*.xcodeproj" | head -n 1)
+          echo "Pods xcodeproj: $PODS_XCODEPROJ"
+
+          # Replace the broken Pods______________ with the correct Pods-<appname> reference
+          # The issue is Hebrew chars get mangled in the framework name
+          # Fix: replace any 'Pods__*' framework reference with correct name
+          PODS_FRAMEWORK=$(grep -o 'Pods-[^ "]*' "$PBXPROJ" | head -n 1 || true)
+          echo "Found Pods framework name: $PODS_FRAMEWORK"
+
+          if [ -z "$PODS_FRAMEWORK" ]; then
+            echo "Trying to find framework in Pods build settings..."
+            PODS_FRAMEWORK=$(find platforms/ios/Pods -name "*.framework" | grep -v ".dSYM" | head -n 1 | xargs basename | sed 's/.framework//' || true)
+          fi
+
+          # Direct fix: patch the OTHER_LDFLAGS to remove the broken Pods__ reference
+          perl -0pi -e 's/-framework ["\x27]?Pods_{2,}["\x27]?//g' "$PBXPROJ"
+          echo "Removed broken Pods______________ framework reference"
+
+          # Also fix in Pods xcconfig files if present
+          find platforms/ios -name "*.xcconfig" -not -path "*/DerivedData/*" | while read f; do
+            perl -0pi -e 's/-framework ["\x27]?Pods_{2,}["\x27]?//g' "$f"
+          done
+
+          echo "Pods fix complete."
 
       - name: Patch AdMob Plus Swift Compatibility for Xcode 26
         run: |
